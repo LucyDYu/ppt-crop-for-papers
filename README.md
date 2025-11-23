@@ -1,162 +1,136 @@
 # PPT Crop for Papers
 
-这是一个用于论文写作的工作流程自动化脚本，可以从 PowerPoint 导出 PDF，进行图像裁剪，并自动同步到 Google Drive 和其他位置。
+> [中文版](README_zh.md) | English
 
-## 功能特性
+This is an automated workflow script for academic writing that exports PDFs from PowerPoint, performs image cropping, and automatically syncs files to Google Drive and Overleaf.
 
-- **自动导出 PDF**: 从 Microsoft PowerPoint 自动导出 PDF 文件
-- **图像裁剪**: 调用外部脚本对 PDF 进行白边裁剪处理
-- **文件同步**: 自动将处理后的文件同步到 Google Drive
-- **时间戳命名**: 生成的文件带有时间戳，便于版本管理
+## Features
 
-## 使用方法
+- **Automatic PDF Export**: Automatically export cropped high-quality PDF files from Microsoft PowerPoint
+- **Image Cropping**: Call external scripts to crop PDF white borders
+- **File Synchronization**: Automatically sync processed files to Google Drive and Overleaf
+- **Timestamp Naming**: Generated files include timestamps for easy version management
 
-### 1. 前置要求
+## Usage
 
-- macOS 系统
+### 1. Prerequisites
+
+- macOS system
 - Microsoft PowerPoint
-- Alfred（用于工作流自动化）
-- pdfcropmargins 和 pdfcrop 工具（用于 PDF 裁剪）
-- Google Drive（用于文件同步）
+- Alfred (for workflow automation)
+- pdfcropmargins and pdfcrop tools (for PDF cropping)
+- Google Drive (for file synchronization)
 
-### 安装依赖
+### Install Dependencies
 
 ```bash
-# 安装 PDF 裁剪工具 (macOS)
+# Install PDF cropping tools (macOS)
 brew install pdfcropmargins
 brew install pdfcrop
 
-# 或者使用 conda
+# Or use conda
 conda install -c conda-forge pdfcropmargins
 ```
 
-### 2. 配置脚本变量
+### 2. Configure Script Variables
 
-在 `for_alfred.applescript` 中修改以下路径：
+Modify the following paths in `for_alfred.applescript`:
 
 ```applescript
-# 修改这行中的路径：
-# /path/to/crop_pdf.sh - 替换为 crop_pdf.sh 的实际路径
-# /path/to/pdf - 替换为 PDF 输出目录路径
-# /path/to/google_drive/ - 替换为 Google Drive 目录路径
-# /path/to/pptx/ - 替换为 PPTX 文件目录路径
+# Modify paths in this line:
+# /path/to/crop_pdf.sh - Replace with the actual path to crop_pdf.sh
+# /path/to/pdf - Replace with the PDF output directory path
+# /path/to/google_drive/ - Replace with the Google Drive directory path
+# /path/to/pptx/ - Replace with the PPTX file directory path
 
 set commandString to "/path/to/crop_pdf.sh /path/to/pdf" & pdfName & ".pdf /path/to/google_drive/MMCL3.pdf; rsync -av /path/to/pptx/MMCL32.pptx /path/to/google_drive/; "
 ```
 
-### 3. PowerPoint 快捷键设置
+### 3. PowerPoint Keyboard Shortcut Setup
 
-PowerPoint 需要设置导出 PDF 的快捷键：
-1. 打开 Settings -> Keyboard Shortcuts -> App Shortcuts
-3. 设置快捷键为 `Command + Shift + E`
+PowerPoint requires setting up a keyboard shortcut for PDF export:
+1. Open Settings -> Keyboard Shortcuts -> App Shortcuts
+3. Set shortcut to `Command + Shift + E`
 
-### 4. 运行脚本
+### 4. Run Script
 
-在 Alfred 中创建工作流，调用 `for_alfred.applescript` 即可一键完成整个流程。
+Create a workflow in Alfred and call `for_alfred.applescript` to complete the entire process with one click. You can also run the script directly without Alfred to crop PPT to PDF.
 ![alt text](<assets/Alfred workflow.png>)
 ![alt text](<assets/Alfred example.png>)
 
-## 文件说明
+## File Description
 
-- `for_alfred.applescript`: 主要的自动化脚本，通过 AppleScript 控制 PowerPoint 和终端操作
-- `crop_pdf.sh`: PDF 裁剪脚本，包含两步裁剪逻辑（白边移除 + 灰色框裁剪）
-- `Placeholder.pptx`: PowerPoint 模板示例，展示了正确的灰色框设计
+- `for_alfred.applescript`: Main automation script that controls PowerPoint and terminal operations via AppleScript
+- `crop_pdf.sh`: PDF cropping script with two-step cropping logic (white border removal + gray frame cropping)
+- `Placeholder.pptx`: PowerPoint template example showing correct gray frame design
 
-## 工作流程
+## Notes
 
-1. 激活 PowerPoint 并导出当前文档为 PDF（最佳打印质量）
-2. 调用裁剪脚本处理 PDF 白边
-3. 将处理后的 PDF 同步到 Google Drive
-4. 将原始 PPTX 文件同步到 Google Drive
-5. 激活 Firefox（用于后续操作，比如 overleaf 页面）
+- Ensure all paths are configured correctly to avoid file operation failures
+- Scripts include delay operations to ensure applications have enough time to respond
+- If Google Drive paths are long, string concatenation logic may need adjustment
 
-## 注意事项
+## Troubleshooting
 
-- 请确保所有路径配置正确，避免文件操作失败
-- 脚本中包含延时操作，确保应用程序有足够时间响应
-- 如果 Google Drive 路径较长，可能需要调整字符串拼接逻辑
+### PDF Export Failure
+- Check that the keyboard shortcut (Command + Shift + E) is correctly set in PowerPoint, manual setup required on Mac
+- Ensure a PowerPoint document is currently open
 
-## 故障排除
+### Cropping Script Error
+- Confirm `pdfcropmargins` and `pdfcrop` tools are installed
+- Check if input file paths exist
+- Verify output directory permissions
 
-### PDF 导出失败
-- 检查 PowerPoint 中是否正确设置了快捷键 (Command + Shift + E), Mac中需要手动设置
-- 确保当前有打开的 PowerPoint 文档
+### Google Drive Sync Failure
+- Check if Google Drive path configuration is correct
+- Confirm sufficient disk space
+- Verify network connection
 
-### 裁剪脚本报错
-- 确认已安装 `pdfcropmargins` 和 `pdfcrop` 工具
-- 检查输入文件路径是否存在
-- 验证输出目录权限
+### Script Unresponsive
+- Check that all applications are properly installed
+- Try increasing delay times in scripts
+- Check system logs for specific errors
 
-### Google Drive 同步失败
-- 检查 Google Drive 路径配置是否正确
-- 确认有足够的磁盘空间
-- 验证网络连接
+## PPT Template Design Details
 
-### 脚本无响应
-- 检查是否所有应用程序都已正确安装
-- 尝试增加脚本中的延时时间
-- 查看系统日志了解具体错误
+The project provides a `Placeholder.pptx` example file demonstrating how to design PPT templates for automatic cropping:
 
-## PPT 模板说明
+**Template Structure**:
+- Outer gray frame indicates the area boundary to be cropped
+- Inner gray frame (optional) represents the specific content area of images
+- Colors can be adjusted according to personal preferences, but avoid colors that are too light to ensure proper detection by cropping scripts
 
-项目包含一个示例文件 `Placeholder.pptx`，展示了如何设计适合裁剪的 PPT 模板：
+**Cropping Principle**:
+The first crop removes all white margins until encountering colored areas. If the color is too light, the script may not detect the boundary accurately. I chose gray because it is neither too prominent nor interferes with drawing creation.
 
-### 模板设计要点
+The second crop further removes the gray frame (3-point margin), ultimately preserving the complete internal image. Since PPT supports multi-page alignment, you can copy gray frames to each page and align positions precisely, making it easy to create large images composed of multiple images.
 
-- **外层灰色框**: 表示会被裁剪掉的区域边界
-- **内层灰色框** (可选): 表示图片的具体内容区域
-- **颜色选择**: 使用灰色框不会太醒目，也不会干扰绘图
-- **颜色要求**: 避免使用太浅的颜色，否则裁剪脚本可能检测不到
+It is precisely because manual cropping is too cumbersome each time that I developed this automation script, hoping to improve efficiency for everyone's academic writing.
 
-### 裁剪逻辑
+## Detailed Workflow
 
-1. **第一次裁剪**: 使用 `pdfcropmargins` 移除所有白色边距，裁剪到遇到有色区域为止
-2. **第二次裁剪**: 使用 `pdfcrop` 进一步裁剪灰色边框（-3 点边距）
-3. **多页对齐**: PPT 支持多页内容，可以将灰色框复制到每一页确保精确对齐
+1. **Automatic PDF Export**: Script simulates keyboard shortcut (Command + Shift + E) to export PDF with best printing quality
+2. **Timestamp Naming**: Generated filename format is `MMCL3-YYYY-MM-DD-HH-MM-SS.pdf`, ensuring unique versions for each modification
+3. **PDF Cropping**: Call `crop_pdf.sh` script for white border and gray frame cropping
+4. **File Synchronization**:
+   - Sync processed PDF to Google Drive
+   - Sync original PPTX file to Google Drive for version management
+5. **Activate Browser**: Open Firefox for subsequent Overleaf page viewing
 
-### PPT 模板设计详解
+## Using in Overleaf
 
-项目提供了一个 `Placeholder.pptx` 示例文件，展示了如何设计适合自动裁剪的 PPT 模板：
+1. Set Google Drive PDF files to public sharing
+2. Use External URL in Overleaf to link to the PDF
+3. Images in the paper update automatically after Overleaf refreshes
 
-**模板结构说明**：
-- 外层灰色框表示将被裁剪掉的区域边界
-- 内层灰色框（可选）代表图片的具体内容区域
-- 颜色可以根据个人喜好调整，但应避免过浅的颜色以确保裁剪脚本能够正确识别
+## Version Management Suggestions
 
-**裁剪原理**：
-第一次裁剪会移除所有白色边距，直到遇到有色区域为止。如果颜色过浅，脚本可能无法准确检测到边界。我选择灰色是因为它既不会过于醒目，也不会干扰绘图创作。
+Google Drive automatically records file modification history, but version retention has time limits. It is recommended to manually save important versions before major modifications.
 
-第二次裁剪会进一步移除灰色边框（3点边距），最终保留内部完整图片。由于 PPT 支持多页对齐，您可以将灰色框复制到每一页并精确对齐位置，这样就能轻松创建由多个图片组成的大图。
-
-**自动化流程**：
-脚本首先自动将 PPT 导出为 PDF（需要预先设置快捷键），导出的文件名会自动添加时间戳，确保每次修改都能生成唯一版本。然后执行裁剪脚本处理 PDF，最后将结果同步到 Google Drive。在 Overleaf 中，您可以通过外部 URL 链接到这些 PDF 文件，每次更新后刷新页面就能看到论文中的图片自动更新。
-
-正是因为每次手动裁剪都过于繁琐，我开发了这个自动化脚本，希望能为大家的论文写作提效助力。
-
-## 详细工作流程
-
-1. **自动导出 PDF**: 脚本模拟快捷键 (Command + Shift + E) 导出 PDF，使用最佳打印质量
-2. **时间戳命名**: 生成的文件名格式为 `MMCL3-YYYY-MM-DD-HH-MM-SS.pdf`，确保每次修改都有唯一版本
-3. **PDF 裁剪**: 调用 `crop_pdf.sh` 脚本进行白边和灰色框裁剪
-4. **文件同步**:
-   - 处理后的 PDF 同步到 Google Drive
-   - 原始 PPTX 文件也同步到 Google Drive，便于版本管理
-5. **激活浏览器**: 打开 Firefox，方便后续在 Overleaf 中查看更新
-
-## 在 Overleaf 中使用
-
-1. 将 Google Drive 中的 PDF 文件设置为公开分享
-2. 在 Overleaf 中使用 External URL 链接到 PDF
-3. Overleaf 刷新后，论文中的图片会自动更新
-
-## 版本管理建议
-
-Google Drive 会自动记录文件修改历史，但版本保留有时间限制。建议在进行重大修改前手动保存重要版本。
-
-## 贡献与反馈
+## Contributing & Feedback
 
 If you find this tool useful, please consider giving it a ⭐ star on GitHub!
 
-如果这个工具为您的工作带来了便利，欢迎访问我的个人主页，我们可以进一步交流想法、探讨合作机会。
+If this tool brings convenience to your work, welcome to visit my [personal homepage](https://lucydyu.github.io/) where we can further exchange ideas and explore collaboration opportunities.
 
 I'm always open to discussions and collaborations!
